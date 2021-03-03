@@ -6,17 +6,19 @@
 [maven]: https://img.shields.io/maven-central/v/io.github.bbstilson/sbt-codeartifact_2.12?color=blue&style=for-the-badge
 [mavenLink]: https://search.maven.org/artifact/io.github.bbstilson/sbt-codeartifact_2.12
 
+
+An sbt plugin for publishing packages to AWS CodeArtifact. It is currently a work in-progress.
+
 ## Install
 
 What you will need:
 
-- AWS CLI v2
 - A CodeArtifact repository
 
 Add the following to your sbt `project/plugins.sbt` file:
 
 ```scala
-addSbtPlugin("io.github.bbstilson" % "sbt-codeartifact" % "0.1.0")
+addSbtPlugin("io.github.bbstilson" % "sbt-codeartifact" % version)
 ```
 
 ## Usage
@@ -29,10 +31,26 @@ import codeartifact.CodeArtifactKeys._
 
 ## Publishing
 
+Here's an example `build.sbt` file:
+
 ```scala
-organization := "org.company"
-codeartifactUrl := "https://your-domain-1234567890.d.codeartifact.us-west-2.amazonaws.com/maven/repo/"
+organization := "io.github.bbstilson"
+
+name := "foo"
+
+version := "0.1.0"
+
+scalaVersion := "2.13.4"
+
+codeArtifactUrl := "https://io-github-bbstilson-1234567890.d.codeartifact.us-west-2.amazonaws.com/maven/private"
+```
+
+Then, to publish, run:
+
+```bash
+sbt:root> codeArtifactPublish
 ```
 
 ### Credentials
 
+Credentials are resolved using the [DefaultCredentialsProvider](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/auth/credentials/DefaultCredentialsProvider.html).
