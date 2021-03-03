@@ -1,4 +1,4 @@
-# SBT Codeartifact
+# SBT CodeArtifact
 
 ![Important Badge][badge] [![Maven][maven]][mavenLink]
 
