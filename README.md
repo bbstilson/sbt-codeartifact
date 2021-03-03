@@ -52,7 +52,7 @@ sbt:root> codeArtifactPublish
 To consume a package, you will need to add the resolver:
 
 ```scala
-val repo = "https://org-allenai-s2-896129387501.d.codeartifact.us-west-2.amazonaws.com/maven/private"
+val repo = "https://io-github-bbstilson-1234567890.d.codeartifact.us-west-2.amazonaws.com/maven/private"
 
 codeArtifactUrl := repo
 
