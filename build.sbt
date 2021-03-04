@@ -1,16 +1,22 @@
 val gitUrl = "https://github.com/bbstilson/sbt-codeartifact"
 
-ThisBuild / version := "0.0.4"
-ThisBuild / scalaVersion := "2.12.12"
-ThisBuild / organization := "io.github.bbstilson"
-ThisBuild / homepage := Some(url(gitUrl))
-ThisBuild / licenses := Seq("MIT" -> url(s"$gitUrl/blob/main/LICENSE"))
-ThisBuild / description := "Package publisher for AWS CodeArtifact"
-ThisBuild / developers := List(
-  Developer("bbstilson", "Brandon Stilson", "@bbstilson", url("https://github.com/bbstilson"))
-)
-ThisBuild / scmInfo := Some(
-  ScmInfo(url(gitUrl), s"git@github.com:bbstilson/sbt-codeartifact.git")
+inThisBuild(
+  version := "0.0.1",
+  scalaVersion := "2.12.12",
+  organization := "io.github.bbstilson",
+  homepage := Some(url(gitUrl)),
+  licenses := Seq("MIT" -> url(s"$gitUrl/blob/main/LICENSE")),
+  description := "Package publisher for AWS CodeArtifact",
+  developers := List(
+    Developer("bbstilson", "Brandon Stilson", "@bbstilson", url("https://github.com/bbstilson"))
+  ),
+  scmInfo := Some(
+    ScmInfo(url(gitUrl), s"git@github.com:bbstilson/sbt-codeartifact.git")
+  ),
+  publishMavenStyle := true,
+  publishArtifact in Test := false,
+  pomIncludeRepository := { _ => false }
+  // publishTo
 )
 
 lazy val core = project

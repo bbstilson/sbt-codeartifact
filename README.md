@@ -27,6 +27,8 @@ import codeartifact.CodeArtifactKeys._
 
 ## Publishing
 
+CodeArtifact provides instructions on how to connect to your repository. Click "View Connection Instructions", then choose "gradle", then copy the `url`.
+
 Here's an example `build.sbt` file:
 
 ```scala
