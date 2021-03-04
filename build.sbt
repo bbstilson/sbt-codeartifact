@@ -4,7 +4,12 @@ inThisBuild(
     homepage := Some(url("https://github.com/bbstilson/sbt-codeartifact")),
     licenses := Seq("MIT" -> url("https://choosealicense.com/licenses/mit/")),
     developers := List(
-      Developer("bbstilson", "Brandon Stilson", "@bbstilson", url("https://github.com/bbstilson"))
+      Developer(
+        "bbstilson",
+        "Brandon Stilson",
+        "bbstilson@fastmail.com",
+        url("https://github.com/bbstilson")
+      )
     )
   )
 )
@@ -17,7 +22,8 @@ lazy val core = project
     libraryDependencies ++= Seq(
       "software.amazon.awssdk" % "codeartifact" % "2.16.10"
     ),
-    scalacOptions -= "-Xfatal-warnings"
+    scalacOptions -= "-Xfatal-warnings",
+    publish / skip := true
   )
 
 lazy val sbtcodeartifact = project

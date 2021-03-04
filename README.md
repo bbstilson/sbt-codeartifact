@@ -3,9 +3,8 @@
 ![Important Badge][badge] [![Maven][maven]][mavenLink]
 
 [badge]: https://img.shields.io/badge/works-on%20my%20machine-success?style=for-the-badge
-[maven]: https://img.shields.io/maven-central/v/io.github.bbstilson/sbt-codeartifact_2.12?color=blue&style=for-the-badge
-[mavenLink]: https://search.maven.org/artifact/io.github.bbstilson/sbt-codeartifact_2.12
-
+[maven]: https://img.shields.io/maven-central/v/io.github.bbstilson/sbt-codeartifact_2.12_1.0?color=blue&style=for-the-badge
+[mavenLink]: https://search.maven.org/artifact/io.github.bbstilson/sbt-codeartifact_2.12_1.0
 
 An sbt plugin for publishing/consuming packages to/from AWS CodeArtifact. It is currently a work in-progress.
 
@@ -51,15 +50,7 @@ sbt:root> codeArtifactPublish
 
 ## Consuming
 
-To consume a package, you will need to add the resolver:
-
-```scala
-val repo = "https://io-github-bbstilson-1234567890.d.codeartifact.us-west-2.amazonaws.com/maven/private"
-
-codeArtifactUrl := repo
-
-resolvers += codeartifact.CodeArtifactRepo.fromUrl(repo).resolver
-```
+A resolver for your repository is added based on the `codeArtifactUrl` key.
 
 ## Credentials
 

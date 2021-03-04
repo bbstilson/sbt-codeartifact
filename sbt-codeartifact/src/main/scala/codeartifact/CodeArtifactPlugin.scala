@@ -45,7 +45,9 @@ object CodeArtifactPlugin extends AutoPlugin {
     ),
     publishTo := Some(codeArtifactRepo.value.resolver),
     publishMavenStyle := true,
-    credentials += codeArtifact.value.credentials
+    credentials += codeArtifact.value.credentials,
+    // Useful for consuming artifacts.
+    resolvers += CodeArtifactRepo.fromUrl(codeArtifactUrl.value).resolver
   ) ++ dependencyOrdering
 
   def dependencyOrdering: Seq[Setting[_]] = Seq(
