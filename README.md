@@ -1,8 +1,7 @@
 # SBT CodeArtifact
 
-![Important Badge][badge] [![Maven][maven]][mavenLink]
+[![Maven][maven]][mavenLink]
 
-[badge]: https://img.shields.io/badge/works-on%20my%20machine-success?style=for-the-badge
 [maven]: https://img.shields.io/maven-central/v/io.github.bbstilson/sbt-codeartifact_2.12_1.0?color=blue&style=for-the-badge
 [mavenLink]: https://search.maven.org/artifact/io.github.bbstilson/sbt-codeartifact_2.12_1.0
 
@@ -28,10 +27,10 @@ import codeartifact.CodeArtifactKeys._
 
 CodeArtifact provides instructions on how to connect to your repository. Click "View Connection Instructions", then choose "gradle", then copy the `url`.
 
-Here's an example `build.sbt` file:
+Here's an example `build.sbt` file that assumes a CodeArtifact repository named "private" in the "com.example" domain has been created:
 
 ```scala
-organization := "io.github.bbstilson"
+organization := "com.example"
 
 name := "foo"
 
@@ -39,7 +38,7 @@ version := "0.1.0"
 
 scalaVersion := "2.13.4"
 
-codeArtifactUrl := "https://io-github-bbstilson-1234567890.d.codeartifact.us-west-2.amazonaws.com/maven/private"
+codeArtifactUrl := "https://com-example-1234567890.d.codeartifact.us-west-2.amazonaws.com/maven/private"
 ```
 
 Then, to publish, run:
@@ -50,7 +49,30 @@ sbt:root> codeArtifactPublish
 
 ## Consuming
 
-A resolver for your repository is added based on the `codeArtifactUrl` key.
+A resolver for your repository is added based on the `codeArtifactUrl` key. You can add more repositories manually like so:
+
+```scala
+def mkCodeArtifactRepoUrl(name: String): String =
+  s"https://com-example-1234567890.d.codeartifact.us-west-2.amazonaws.com/maven/$name"
+
+val additional = List("foo", "superfoo", "other")
+
+codeArtifactUrl := mkCodeArtifactRepoUrl("private")
+
+resolvers ++= additional
+  .map(mkCodeArtifactRepoUrl)
+  .map(codeartifact.CodeArtifactRepo.fromUrl)
+  .map(_.resolver)
+```
+
+In sbt:
+
+```sbt
+sbt:root> show resolvers
+[info] * com-example/foo: https://com-example-1234567890.d.codeartifact.us-west-2.amazonaws.com/maven/foo
+[info] * com-example/superfoo: https://com-example-1234567890.d.codeartifact.us-west-2.amazonaws.com/maven/superfoo
+[info] * com-example/other: https://com-example-1234567890.d.codeartifact.us-west-2.amazonaws.com/maven/other
+```
 
 ## Credentials
 
