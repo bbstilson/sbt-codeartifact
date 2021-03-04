@@ -2,7 +2,6 @@ val gitUrl = "https://github.com/bbstilson/sbt-codeartifact"
 
 inThisBuild(
   Seq(
-    version := "0.0.1",
     scalaVersion := "2.12.12",
     organization := "io.github.bbstilson",
     homepage := Some(url(gitUrl)),
@@ -16,8 +15,16 @@ inThisBuild(
     ),
     publishMavenStyle := true,
     publishArtifact in Test := false,
-    pomIncludeRepository := { _ => false }
-    // publishTo
+    pomIncludeRepository := { _ => false },
+    releasePublishArtifactsAction := PgpKeys.publishSigned.value,
+    publishTo := {
+      val nexus = "https://oss.sonatype.org/"
+      if (isSnapshot.value) {
+        Some("snapshots".at(nexus + "content/repositories/snapshots"))
+      } else {
+        Some("releases".at(nexus + "service/local/staging/deploy/maven2"))
+      }
+    }
   )
 )
 
