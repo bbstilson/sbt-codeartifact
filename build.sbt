@@ -1,32 +1,26 @@
 val gitUrl = "https://github.com/bbstilson/sbt-codeartifact"
-
-inThisBuild(
-  Seq(
-    scalaVersion := "2.12.12",
-    organization := "io.github.bbstilson",
-    homepage := Some(url(gitUrl)),
-    licenses := Seq("MIT" -> url(s"$gitUrl/blob/main/LICENSE")),
-    description := "Package publisher for AWS CodeArtifact",
-    developers := List(
-      Developer("bbstilson", "Brandon Stilson", "@bbstilson", url("https://github.com/bbstilson"))
-    ),
-    scmInfo := Some(
-      ScmInfo(url(gitUrl), s"git@github.com:bbstilson/sbt-codeartifact.git")
-    ),
-    publishMavenStyle := true,
-    publishArtifact in Test := false,
-    pomIncludeRepository := { _ => false },
-    releasePublishArtifactsAction := PgpKeys.publishSigned.value,
-    publishTo := {
-      val nexus = "https://oss.sonatype.org/"
-      if (isSnapshot.value) {
-        Some("snapshots".at(nexus + "content/repositories/snapshots"))
-      } else {
-        Some("releases".at(nexus + "service/local/staging/deploy/maven2"))
-      }
-    }
-  )
+organization := "io.github.bbstilson"
+homepage := Some(url(gitUrl))
+licenses := Seq("MIT" -> url(s"$gitUrl/blob/main/LICENSE"))
+description := "Package publisher for AWS CodeArtifact"
+developers := List(
+  Developer("bbstilson", "Brandon Stilson", "@bbstilson", url("https://github.com/bbstilson"))
 )
+scmInfo := Some(
+  ScmInfo(url(gitUrl), s"git@github.com:bbstilson/sbt-codeartifact.git")
+)
+publishMavenStyle := true
+publishArtifact in Test := false
+pomIncludeRepository := { _ => false }
+releasePublishArtifactsAction := PgpKeys.publishSigned.value
+publishTo := {
+  val nexus = "https://oss.sonatype.org/"
+  if (isSnapshot.value) {
+    Some("snapshots".at(nexus + "content/repositories/snapshots"))
+  } else {
+    Some("releases".at(nexus + "service/local/staging/deploy/maven2"))
+  }
+}
 
 lazy val core = project
   .in(file("core"))
