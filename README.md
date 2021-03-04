@@ -77,3 +77,26 @@ sbt:root> show resolvers
 ## Credentials
 
 Credentials are resolved using the [DefaultCredentialsProvider](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/auth/credentials/DefaultCredentialsProvider.html).
+
+## SBT Release
+
+If you would like to use this in conjunction with [`sbt-release`](https://github.com/sbt/sbt-release), you will need to override the [default release process](https://github.com/sbt/sbt-release#can-we-finally-customize-that-release-process-please); specifically, the publish step:
+
+```scala
+import ReleaseTransformations._
+
+releaseProcess := Seq[ReleaseStep](
+  checkSnapshotDependencies,
+  inquireVersions,
+  runClean,
+  runTest,
+  setReleaseVersion,
+  commitReleaseVersion,
+  tagRelease,
+  // This is the only step that varies.
+  releaseStepCommandAndRemaining("codeArtifactPublish"),
+  setNextVersion,
+  commitNextVersion,
+  pushChanges
+)
+```

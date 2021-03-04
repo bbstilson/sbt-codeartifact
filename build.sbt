@@ -22,8 +22,7 @@ lazy val core = project
     libraryDependencies ++= Seq(
       "software.amazon.awssdk" % "codeartifact" % "2.16.10"
     ),
-    scalacOptions -= "-Xfatal-warnings",
-    publish / skip := true
+    scalacOptions -= "-Xfatal-warnings"
   )
 
 lazy val sbtcodeartifact = project
