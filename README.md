@@ -5,7 +5,7 @@
 [maven]: https://img.shields.io/maven-central/v/io.github.bbstilson/sbt-codeartifact_2.12_1.0?color=blue&style=for-the-badge
 [mavenLink]: https://search.maven.org/artifact/io.github.bbstilson/sbt-codeartifact_2.12_1.0
 
-An sbt plugin for publishing/consuming packages to/from AWS CodeArtifact. It is currently a work in-progress.
+An sbt plugin for publishing/consuming packages to/from AWS CodeArtifact.
 
 ## Install
 
