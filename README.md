@@ -32,7 +32,7 @@ Here's an example `build.sbt` file that assumes a CodeArtifact repository named 
 ```scala
 organization := "com.example"
 
-name := "foo"
+name := "library"
 
 version := "0.1.0"
 
@@ -44,7 +44,7 @@ codeArtifactUrl := "https://com-example-1234567890.d.codeartifact.us-west-2.amaz
 Then, to publish, run:
 
 ```bash
-sbt:root> codeArtifactPublish
+sbt:library> codeArtifactPublish
 ```
 
 ## Consuming
@@ -67,8 +67,9 @@ resolvers ++= additional
 
 In sbt:
 
-```sbt
-sbt:root> show resolvers
+```plaintext
+sbt:library> show resolvers
+[info] * com-example/private: https://com-example-1234567890.d.codeartifact.us-west-2.amazonaws.com/maven/private
 [info] * com-example/foo: https://com-example-1234567890.d.codeartifact.us-west-2.amazonaws.com/maven/foo
 [info] * com-example/superfoo: https://com-example-1234567890.d.codeartifact.us-west-2.amazonaws.com/maven/superfoo
 [info] * com-example/other: https://com-example-1234567890.d.codeartifact.us-west-2.amazonaws.com/maven/other
