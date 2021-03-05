@@ -2,8 +2,8 @@
 
 [![Maven][maven]][mavenLink]
 
-[maven]: https://img.shields.io/maven-central/v/io.github.bbstilson/sbt-codeartifact_2.12_1.0?color=blue&style=for-the-badge
-[mavenLink]: https://search.maven.org/artifact/io.github.bbstilson/sbt-codeartifact_2.12_1.0
+[maven]: https://maven-badges.herokuapp.com/maven-central/io.github.bbstilson/sbt-codeartifact/badge.svg?kill_cache=1&color=blue&style=for-the-badge
+[mavenLink]: https://search.maven.org/search?q=g:io.github.bbstilson%20AND%20a:sbt-codeartifact
 
 An sbt plugin for publishing/consuming packages to/from AWS CodeArtifact.
 
