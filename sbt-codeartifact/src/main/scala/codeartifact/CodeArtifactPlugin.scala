@@ -41,7 +41,9 @@ object CodeArtifactPlugin extends AutoPlugin {
       organization = organization.value,
       name = name.value,
       version = version.value,
-      scalaVersion = scalaVersion.value
+      scalaVersion = scalaVersion.value,
+      isSbtPlugin = sbtPlugin.value,
+      sbtBinaryVersion = sbtBinaryVersion.value
     ),
     publishTo := Some(codeArtifactRepo.value.resolver),
     publishMavenStyle := true,
