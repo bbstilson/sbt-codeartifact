@@ -66,5 +66,4 @@ object CodeArtifactPlugin extends AutoPlugin {
       .dependsOn(codeArtifactWaitForPackageAvailable)
       .value
   )
-
 }
