@@ -80,8 +80,9 @@ class CodeArtifact(
       sys.error("Did not successfully update packages.")
     }
 
-    resp.successfulVersions().asScala.foreach { case (k, success) =>
-      logger.info(s"$k - ${success.statusAsString()}")
+    resp.successfulVersions().asScala.foreach { case (version, success) =>
+      // Published - library_2.1x a.b.c
+      logger.info(s"${success.statusAsString()} - ${pkg.asMaven} $version")
     }
   }
 

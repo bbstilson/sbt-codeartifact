@@ -21,6 +21,14 @@ jobs:
       with:
         java-version: ${{ matrix.java-version }}
 
+    - name: Run scalafmt
+      run: |
+        sbt scalafmtCheckAll
+
+    - name: Run scalafmt sbt
+      run: |
+        sbt scalafmtSbtCheck
+
     - name: Run tests
       run: |
-        sbt ^test
+        sbt test

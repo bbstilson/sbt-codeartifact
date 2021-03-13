@@ -14,6 +14,18 @@ inThisBuild(
   )
 )
 
+lazy val testSettings: Seq[Setting[_]] = Seq(
+  scriptedLaunchOpts := {
+    scriptedLaunchOpts.value ++
+      Seq("-Xmx1024M", "-Dplugin.version=" + version.value)
+  },
+  scriptedBufferLog := false,
+  test := {
+    (Test / test).value
+    scripted.toTask("").value
+  }
+)
+
 lazy val core = project
   .in(file("core"))
   .enablePlugins(SbtPlugin)
@@ -21,9 +33,9 @@ lazy val core = project
     name := "sbt-codeartifact-core",
     libraryDependencies ++= Seq(
       "software.amazon.awssdk" % "codeartifact" % "2.16.10"
-    ),
-    scalacOptions -= "-Xfatal-warnings"
+    )
   )
+  .settings(testSettings)
 
 lazy val sbtcodeartifact = project
   .in(file("sbt-codeartifact"))
@@ -38,6 +50,7 @@ lazy val sbtcodeartifact = project
       }
     }
   )
+  .settings(testSettings)
 
 lazy val root = project
   .in(file("."))
