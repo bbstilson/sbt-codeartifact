@@ -27,15 +27,7 @@ object CodeArtifactPlugin extends AutoPlugin {
     ),
     codeArtifactWaitForPackageAvailable := codeArtifact.value.waitForPackageAvailable(),
     codeArtifactUpdateStatus := codeArtifact.value.updatePackageVersionStatus(),
-    codeArtifactPublish := {
-      // First, do a normal publish.
-      publish.value
-      // Then, wait for the package to be available on CodeArtifact.
-      codeArtifactWaitForPackageAvailable.value
-      // Then, manually update the status.
-      // See: https://docs.aws.amazon.com/codeartifact/latest/ug/packages-overview.html#package-version-status
-      codeArtifactUpdateStatus.value
-    },
+    codeArtifactPublish := dynamicallyPublish.value,
     codeArtifactRepo := CodeArtifactRepo.fromUrl(codeArtifactUrl.value),
     codeArtifactPackage := CodeArtifactPackage(
       organization = organization.value,
@@ -51,6 +43,29 @@ object CodeArtifactPlugin extends AutoPlugin {
     // Useful for consuming artifacts.
     resolvers += CodeArtifactRepo.fromUrl(codeArtifactUrl.value).resolver
   ) ++ dependencyOrdering
+
+  // Uses taskDyn because it can return one of two potential tasks
+  // as its result, each with their own dependencies.
+  // See: https://www.scala-sbt.org/1.x/docs/Howto-Dynamic-Task.html
+  private def dynamicallyPublish: Def.Initialize[Task[Unit]] = Def.taskDyn {
+    val shouldSkip = (publish / skip).value
+    val logger = streams.value.log
+    val ref = thisProjectRef.value
+
+    if (shouldSkip) Def.task {
+      logger.debug(s"skipping publish for ${ref.project}")
+    }
+    else
+      Def.task {
+        // First, do a normal publish.
+        publish.value
+        // Then, wait for the package to be available on CodeArtifact.
+        codeArtifactWaitForPackageAvailable.value
+        // Then, manually update the status.
+        // See: https://docs.aws.amazon.com/codeartifact/latest/ug/packages-overview.html#package-version-status
+        codeArtifactUpdateStatus.value
+      }
+  }
 
   def dependencyOrdering: Seq[Setting[_]] = Seq(
     // Although the body of codeArtifactPublish above seems ordered, tasks in the task graph
