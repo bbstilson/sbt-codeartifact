@@ -1,21 +1,30 @@
 package codeartifact
 
-case class CodeArtifactPackage(
+final case class CodeArtifactPackage(
   organization: String,
   name: String,
   version: String,
   scalaVersion: String,
-  isSbtPlugin: Boolean,
-  sbtBinaryVersion: String
+  sbtBinaryVersion: Option[String],
+  isScalaProject: Boolean
 ) {
 
   def asMaven: String = {
-    val mvn = sbt.CrossVersion
-      .partialVersion(scalaVersion)
-      .map { case (maj, min) => List(name, "_", maj, ".", min).mkString }
-      .getOrElse { sys.error("Invalid scalaVersion.") }
+    // We only want to append the scala binary version if we are publishing a scala library.
+    // This can be deterined by the `crossPaths` sbt flag, for example.
+    // See: https://www.scala-sbt.org/1.x/docs/Cross-Build.html#Scala-version+specific+source+directory
+    val mvn = if (isScalaProject) {
+      sbt.CrossVersion
+        .partialVersion(scalaVersion)
+        .map { case (maj, min) => List(name, "_", maj, ".", min).mkString }
+        .getOrElse { sys.error("Invalid scalaVersion.") }
+    } else {
+      name
+    }
 
-    if (isSbtPlugin) mvn + "_" + sbtBinaryVersion else mvn
+    sbtBinaryVersion
+      .map(mvn + "_" + _)
+      .getOrElse(mvn)
   }
 
 }

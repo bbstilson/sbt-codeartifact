@@ -34,8 +34,9 @@ object CodeArtifactPlugin extends AutoPlugin {
       name = name.value,
       version = version.value,
       scalaVersion = scalaVersion.value,
-      isSbtPlugin = sbtPlugin.value,
-      sbtBinaryVersion = sbtBinaryVersion.value
+      sbtBinaryVersion = if (sbtPlugin.value) Some(sbtBinaryVersion.value) else None,
+      // See: https://www.scala-sbt.org/1.x/docs/Cross-Build.html#Scala-version+specific+source+directory
+      isScalaProject = crossPaths.value
     ),
     publishTo := Some(codeArtifactRepo.value.resolver),
     publishMavenStyle := true,
