@@ -1,5 +1,9 @@
 package codeartifact
 
+import java.time.format.DateTimeFormatter
+import java.time.ZoneId
+import java.time.Instant
+
 final case class CodeArtifactPackage(
   organization: String,
   name: String,
@@ -11,8 +15,6 @@ final case class CodeArtifactPackage(
 
   def asMaven: String = {
     // We only want to append the scala binary version if we are publishing a scala library.
-    // This can be deterined by the `crossPaths` sbt flag, for example.
-    // See: https://www.scala-sbt.org/1.x/docs/Cross-Build.html#Scala-version+specific+source+directory
     val mvn = if (isScalaProject) {
       sbt.CrossVersion
         .partialVersion(scalaVersion)
@@ -27,4 +29,27 @@ final case class CodeArtifactPackage(
       .getOrElse(mvn)
   }
 
+  def basePublishPath: String = s"${organization.replace(".", "/")}/$asMaven"
+  def versionPublishPath: String = s"$basePublishPath/$version"
+
+  private def currentTimeNumber() =
+    DateTimeFormatter
+      .ofPattern("yyyyMMddHHmmss")
+      .withZone(ZoneId.systemDefault())
+      .format(Instant.now())
+
+  def mavenMetadata: String = {
+    <metadata modelVersion="1.1.0">
+      <groupId>{organization}</groupId>
+      <artifactId>{asMaven}</artifactId>
+      <versioning>
+        <latest>{version}</latest>
+        <release>{version}</release>
+        <versions>
+          <version>{version}</version>
+        </versions>
+        <lastUpdated>{currentTimeNumber()}</lastUpdated>
+      </versioning>
+    </metadata>
+  }.buildString(stripComments = true)
 }

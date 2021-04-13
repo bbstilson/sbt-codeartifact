@@ -20,15 +20,14 @@ trait CodeArtifactKeys {
 }
 
 trait InternalCodeArtifactKeys {
-  val codeArtifact = taskKey[CodeArtifact]("Covenience wrapper around a repo and package.")
+  val codeArtifactReadTimeout = taskKey[Int]("API request read timeout. Defaults to 1 minute.")
+  val codeArtifactConnectTimeout = taskKey[Int]("API request read timeout. Defaults to 30 seconds.")
   val codeArtifactRepo = taskKey[CodeArtifactRepo]("CodeArtifact repository.")
   val codeArtifactPackage = taskKey[CodeArtifactPackage]("CodeArtifact package.")
 
-  val codeArtifactWaitForPackageAvailable =
-    taskKey[Unit]("Waits for the package to be availble so that the status can be updated.")
-
-  val codeArtifactUpdateStatus =
-    taskKey[Unit]("Updates the package status to Published.")
+  val codeArtifactToken = taskKey[String](
+    "CodeArtifact authentication. Provided by environment variable CODEARTIFACT_AUTH_TOKEN or fetched dynamically from available AWS credentials."
+  )
 }
 
 object CodeArtifactKeys extends CodeArtifactKeys
