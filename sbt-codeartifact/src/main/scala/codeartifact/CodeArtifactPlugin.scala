@@ -57,43 +57,43 @@ object CodeArtifactPlugin extends AutoPlugin {
     if (shouldSkip) Def.task {
       logger.debug(s"Skipping publish for ${ref.project}")
     }
-    else {
-      Def.task {
-        val logger = streams.value.log
-        val api = new CodeArtifactApi(
-          codeArtifactToken.value,
-          readTimeout = codeArtifactReadTimeout.value,
-          connectTimeout = codeArtifactConnectTimeout.value
-        )
-        val url = codeArtifactUrl.value.stripSuffix("/")
-        val pkg = codeArtifactPackage.value
-        val basePublishPath = pkg.basePublishPath
-        val versionPublishPath = pkg.versionPublishPath
+    else publish0
+  }
 
-        val files = packagedArtifacts.value.toList
-          // Drop Artifact.
-          .map { case (_, file) => file }
-          // Convert to os.Path.
-          .map(file => os.Path(file))
-          // Create CodeArtifact file name.
-          .map(file => s"$versionPublishPath/${file.last}" -> file)
+  private def publish0: Def.Initialize[Task[Unit]] = Def.task {
+    val logger = streams.value.log
+    val api = new CodeArtifactApi(
+      codeArtifactToken.value,
+      readTimeout = codeArtifactReadTimeout.value,
+      connectTimeout = codeArtifactConnectTimeout.value
+    )
+    val url = codeArtifactUrl.value.stripSuffix("/")
+    val pkg = codeArtifactPackage.value
+    val basePublishPath = pkg.basePublishPath
+    val versionPublishPath = pkg.versionPublishPath
 
-        val metadataFile = {
-          val td = os.temp.dir()
-          os.write(td / "maven-metadata.xml", codeArtifactPackage.value.mavenMetadata)
-          val file = td / "maven-metadata.xml"
-          s"$basePublishPath/${file.last}" -> file
-        }
+    val files = packagedArtifacts.value.toList
+      // Drop Artifact.
+      .map { case (_, file) => file }
+      // Convert to os.Path.
+      .map(file => os.Path(file))
+      // Create CodeArtifact file name.
+      .map(file => s"$versionPublishPath/${file.last}" -> file)
 
-        val responses = (files :+ metadataFile)
-          .map { case (fileName, file) =>
-            logger.info(s"Uploading $fileName")
-            api.upload(s"$url/$fileName", os.read.bytes(file))
-          }
-
-        reportPublishResults(responses, logger)
-      }
+    val metadataFile = {
+      val td = os.temp.dir()
+      os.write(td / "maven-metadata.xml", codeArtifactPackage.value.mavenMetadata)
+      val file = td / "maven-metadata.xml"
+      s"$basePublishPath/${file.last}" -> file
     }
+
+    val responses = (files :+ metadataFile)
+      .map { case (fileName, file) =>
+        logger.info(s"Uploading $fileName")
+        api.upload(s"$url/$fileName", os.read.bytes(file))
+      }
+
+    reportPublishResults(responses, logger)
   }
 
   private def reportPublishResults(
