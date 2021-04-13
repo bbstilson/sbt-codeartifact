@@ -2,6 +2,7 @@ package codeartifact
 
 import sbt._
 import sbt.Keys._
+import sbt.internal.util.ManagedLogger
 
 object CodeArtifactPlugin extends AutoPlugin {
   import CodeArtifactKeys._
@@ -20,15 +21,15 @@ object CodeArtifactPlugin extends AutoPlugin {
   )
 
   def codeArtifactSettings: Seq[Setting[_]] = Seq(
-    codeArtifact := new CodeArtifact(
-      codeArtifactRepo.value,
-      codeArtifactPackage.value,
-      streams.value.log
-    ),
-    codeArtifactWaitForPackageAvailable := codeArtifact.value.waitForPackageAvailable(),
-    codeArtifactUpdateStatus := codeArtifact.value.updatePackageVersionStatus(),
     codeArtifactPublish := dynamicallyPublish.value,
     codeArtifactRepo := CodeArtifactRepo.fromUrl(codeArtifactUrl.value),
+    codeArtifactToken := sys.env
+      .getOrElse(
+        "CODEARTIFACT_AUTH_TOKEN",
+        CodeArtifact.getAuthToken(codeArtifactRepo.value)
+      ),
+    codeArtifactConnectTimeout := CodeArtifact.Defaults.CONNECT_TIMEOUT,
+    codeArtifactReadTimeout := CodeArtifact.Defaults.READ_TIMEOUT,
     codeArtifactPackage := CodeArtifactPackage(
       organization = organization.value,
       name = name.value,
@@ -38,12 +39,12 @@ object CodeArtifactPlugin extends AutoPlugin {
       // See: https://www.scala-sbt.org/1.x/docs/Cross-Build.html#Scala-version+specific+source+directory
       isScalaProject = crossPaths.value
     ),
+    credentials += CodeArtifact.mkCredentials(codeArtifactRepo.value, codeArtifactToken.value),
     publishTo := Some(codeArtifactRepo.value.resolver),
     publishMavenStyle := true,
-    credentials += codeArtifact.value.credentials,
     // Useful for consuming artifacts.
     resolvers += CodeArtifactRepo.fromUrl(codeArtifactUrl.value).resolver
-  ) ++ dependencyOrdering
+  )
 
   // Uses taskDyn because it can return one of two potential tasks
   // as its result, each with their own dependencies.
@@ -54,32 +55,62 @@ object CodeArtifactPlugin extends AutoPlugin {
     val ref = thisProjectRef.value
 
     if (shouldSkip) Def.task {
-      logger.debug(s"skipping publish for ${ref.project}")
+      logger.debug(s"Skipping publish for ${ref.project}")
     }
-    else
-      Def.task {
-        // First, do a normal publish.
-        publish.value
-        // Then, wait for the package to be available on CodeArtifact.
-        codeArtifactWaitForPackageAvailable.value
-        // Then, manually update the status.
-        // See: https://docs.aws.amazon.com/codeartifact/latest/ug/packages-overview.html#package-version-status
-        codeArtifactUpdateStatus.value
-      }
+    else publish0
   }
 
-  def dependencyOrdering: Seq[Setting[_]] = Seq(
-    // Although the body of codeArtifactPublish above seems ordered, tasks in the task graph
-    // can/will be executed in parallel if they can be. The following few lines define some
-    // ordering requirements.
-    //
-    // We can only wait for the package to be available after it has finished publishing.
-    codeArtifactWaitForPackageAvailable := codeArtifactWaitForPackageAvailable
-      .dependsOn(publish)
-      .value,
-    // We can only update the package status after it is made available.
-    codeArtifactUpdateStatus := codeArtifactUpdateStatus
-      .dependsOn(codeArtifactWaitForPackageAvailable)
-      .value
-  )
+  private def publish0: Def.Initialize[Task[Unit]] = Def.task {
+    val logger = streams.value.log
+    val api = new CodeArtifactApi(
+      codeArtifactToken.value,
+      readTimeout = codeArtifactReadTimeout.value,
+      connectTimeout = codeArtifactConnectTimeout.value
+    )
+    val url = codeArtifactUrl.value.stripSuffix("/")
+    val pkg = codeArtifactPackage.value
+    val basePublishPath = pkg.basePublishPath
+    val versionPublishPath = pkg.versionPublishPath
+
+    val files = packagedArtifacts.value.toList
+      // Drop Artifact.
+      .map { case (_, file) => file }
+      // Convert to os.Path.
+      .map(file => os.Path(file))
+      // Create CodeArtifact file name.
+      .map(file => s"$versionPublishPath/${file.last}" -> file)
+
+    val metadataFile = {
+      val td = os.temp.dir()
+      os.write(td / "maven-metadata.xml", codeArtifactPackage.value.mavenMetadata)
+      val file = td / "maven-metadata.xml"
+      s"$basePublishPath/${file.last}" -> file
+    }
+
+    val responses = (files :+ metadataFile)
+      .map { case (fileName, file) =>
+        logger.info(s"Uploading $fileName")
+        api.upload(s"$url/$fileName", os.read.bytes(file))
+      }
+
+    reportPublishResults(responses, logger)
+  }
+
+  private def reportPublishResults(
+    publishResults: Seq[requests.Response],
+    logger: ManagedLogger
+  ) = {
+    if (publishResults.forall(_.is2xx)) {
+      logger.info(s"Successfully published to AWS Codeartifact")
+    } else {
+      val errors = publishResults
+        .filterNot(_.is2xx)
+        .map { response =>
+          s"Code: ${response.statusCode}, message: ${response.text()}"
+        }
+        .mkString("\n")
+
+      throw new RuntimeException(s"Failed to publish to AWS Codeartifact. Errors: \n$errors")
+    }
+  }
 }

@@ -1,9 +1,9 @@
 # SBT CodeArtifact
 
-[![Maven][maven]][mavenLink]
+[![Maven][maven]][mavenlink]
 
 [maven]: https://maven-badges.herokuapp.com/maven-central/io.github.bbstilson/sbt-codeartifact/badge.svg?kill_cache=1&color=blue&style=for-the-badge
-[mavenLink]: https://search.maven.org/search?q=g:io.github.bbstilson%20AND%20a:sbt-codeartifact
+[mavenlink]: https://search.maven.org/search?q=g:io.github.bbstilson%20AND%20a:sbt-codeartifact
 
 An sbt plugin for publishing/consuming packages to/from AWS CodeArtifact.
 
@@ -77,7 +77,13 @@ sbt:library> show resolvers
 
 ## Credentials
 
-Credentials are resolved using the [DefaultCredentialsProvider](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/auth/credentials/DefaultCredentialsProvider.html).
+Your CodeArtifact Authentication Token is fetched dynamically using the AWS Java SDK. Credentials are resolved using the [DefaultCredentialsProvider](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/auth/credentials/DefaultCredentialsProvider.html).
+
+If you would like to provide the token statically (for example, if your AWS creds are unavailable), then you can provide the token as an environment variable:
+
+```bash
+export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain domain-name --domain-owner domain-owner-id --query authorizationToken --output text --profile profile-name`
+```
 
 ## SBT Release
 
