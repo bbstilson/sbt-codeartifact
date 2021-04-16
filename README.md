@@ -52,24 +52,17 @@ sbt:library> codeArtifactPublish
 A resolver for your repository is added based on the `codeArtifactUrl` key. You can add more repositories manually like so:
 
 ```scala
-def mkCodeArtifactRepoUrl(name: String): String =
-  s"https://com-example-1234567890.d.codeartifact.us-west-2.amazonaws.com/maven/$name"
+val codeArtifactUrlBase = "https://com-example-1234567890.d.codeartifact.us-west-2.amazonaws.com/maven/"
 
-val additional = List("foo", "superfoo", "other")
-
-codeArtifactUrl := mkCodeArtifactRepoUrl("private")
-
-resolvers ++= additional
-  .map(mkCodeArtifactRepoUrl)
-  .map(codeartifact.CodeArtifactRepo.fromUrl)
-  .map(_.resolver)
+codeArtifactUrl := codeArtifactUrlBase + "release"
+codeArtifactResolvers := List("foo", "bar", "baz").map(repo => codeArtifactUrlBase + repo)
 ```
 
 In sbt:
 
 ```plaintext
 sbt:library> show resolvers
-[info] * com-example/private: https://com-example-1234567890.d.codeartifact.us-west-2.amazonaws.com/maven/private
+[info] * com-example/private: https://com-example-1234567890.d.codeartifact.us-west-2.amazonaws.com/maven/release
 [info] * com-example/foo: https://com-example-1234567890.d.codeartifact.us-west-2.amazonaws.com/maven/foo
 [info] * com-example/superfoo: https://com-example-1234567890.d.codeartifact.us-west-2.amazonaws.com/maven/superfoo
 [info] * com-example/other: https://com-example-1234567890.d.codeartifact.us-west-2.amazonaws.com/maven/other

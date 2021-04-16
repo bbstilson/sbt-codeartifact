@@ -17,7 +17,8 @@ object CodeArtifactPlugin extends AutoPlugin {
   object autoImport extends CodeArtifactKeys
 
   def buildPublishSettings: Seq[Setting[_]] = Seq(
-    codeArtifactUrl in ThisBuild := ""
+    ThisBuild / codeArtifactUrl := "",
+    ThisBuild / codeArtifactResolvers := Nil
   )
 
   def codeArtifactSettings: Seq[Setting[_]] = Seq(
@@ -39,11 +40,19 @@ object CodeArtifactPlugin extends AutoPlugin {
       // See: https://www.scala-sbt.org/1.x/docs/Cross-Build.html#Scala-version+specific+source+directory
       isScalaProject = crossPaths.value
     ),
-    credentials += CodeArtifact.mkCredentials(codeArtifactRepo.value, codeArtifactToken.value),
+    credentials ++= {
+      val token = codeArtifactToken.value
+      val repos = codeArtifactRepo.value +: codeArtifactResolvers.value
+        .map(CodeArtifactRepo.fromUrl)
+
+      repos.map(CodeArtifact.mkCredentials(token))
+    },
     publishTo := Some(codeArtifactRepo.value.resolver),
     publishMavenStyle := true,
     // Useful for consuming artifacts.
-    resolvers += CodeArtifactRepo.fromUrl(codeArtifactUrl.value).resolver
+    resolvers ++= (codeArtifactUrl.value +: codeArtifactResolvers.value)
+      .map(CodeArtifactRepo.fromUrl)
+      .map(_.resolver)
   )
 
   // Uses taskDyn because it can return one of two potential tasks

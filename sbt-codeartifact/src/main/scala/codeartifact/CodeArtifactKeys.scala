@@ -17,6 +17,9 @@ trait CodeArtifactKeys {
 
   val codeArtifactUrl: SettingKey[String] =
     settingKey[String]("CodeArtifact connection url.")
+
+  val codeArtifactResolvers: SettingKey[List[String]] =
+    settingKey[List[String]]("Additional CodeArtifact repos from which to consume packages.")
 }
 
 trait InternalCodeArtifactKeys {

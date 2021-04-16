@@ -8,7 +8,7 @@ import scala.concurrent.duration._
 
 object CodeArtifact {
 
-  def mkCredentials(repo: CodeArtifactRepo, token: String): Credentials = Credentials(
+  def mkCredentials(token: String)(repo: CodeArtifactRepo): Credentials = Credentials(
     userName = "aws",
     realm = repo.realm,
     host = repo.host,
