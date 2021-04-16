@@ -17,11 +17,11 @@ lazy val checkResolversAndCredentials = taskKey[Unit](
 
 checkResolversAndCredentials := {
   val repos = resolvers.value.map(_.name)
-  val creds = credentials.value
+  val creds = credentials.value.map(_.toString())
 
   assert(repos.size == 2, "CodeArtifact resolvers were not added.")
   assert(creds.size == 2, "CodeArtifact credentials were not added.")
-  assert(creds.head.toString() == creds.last.toString(), "Credentials did not match.")
+  assert(creds.head == creds.last, "Credentials did not match.")
   assert(repos.head == repos.last, "Resolvers did not match.")
 
   streams.value.log.success("Added credentials and resolvers.")
