@@ -13,22 +13,23 @@ jobs:
         java-version: [8, 11]
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
-    - name: Set up JDK & sbt
-      uses: olafurpg/setup-scala@v10
-      with:
-        java-version: ${{ matrix.java-version }}
+      - name: Set up JDK & sbt
+        uses: olafurpg/setup-scala@v10
+        with:
+          java-version: ${{ matrix.java-version }}
 
-    - name: Run scalafmt
-      run: |
-        sbt scalafmtCheckAll
+      - name: Run scalafmt
+        run: sbt scalafmtCheckAll
 
-    - name: Run scalafmt sbt
-      run: |
-        sbt scalafmtSbtCheck
+      - name: Run scalafmt sbt
+        run: sbt scalafmtSbtCheck
 
-    - name: Run tests
-      run: |
-        sbt test
+      - name: Run tests
+        run: sbt test
+        env:
+          AWS_REGION: us-west-2
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
