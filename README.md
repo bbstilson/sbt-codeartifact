@@ -64,8 +64,8 @@ In sbt:
 sbt:library> show resolvers
 [info] * com-example/release: https://com-example-1234567890.d.codeartifact.us-west-2.amazonaws.com/maven/release
 [info] * com-example/foo: https://com-example-1234567890.d.codeartifact.us-west-2.amazonaws.com/maven/foo
-[info] * com-example/bar: https://com-example-1234567890.d.codeartifact.us-west-2.amazonaws.com/maven/superfoo
-[info] * com-example/baz: https://com-example-1234567890.d.codeartifact.us-west-2.amazonaws.com/maven/other
+[info] * com-example/bar: https://com-example-1234567890.d.codeartifact.us-west-2.amazonaws.com/maven/bar
+[info] * com-example/baz: https://com-example-1234567890.d.codeartifact.us-west-2.amazonaws.com/maven/baz
 ```
 
 ## Credentials
