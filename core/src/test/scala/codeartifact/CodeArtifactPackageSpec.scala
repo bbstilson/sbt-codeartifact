@@ -6,6 +6,7 @@ object CodeArtifactPackageSpec extends TestSuite {
 
   val PackageVersion = "1.2.3"
   val ScalaVersion = "3.2.1"
+  println("hey")
 
   val basePackage =
     CodeArtifactPackage("org.example", "name", PackageVersion, ScalaVersion, None, true)
