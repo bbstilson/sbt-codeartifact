@@ -12,19 +12,22 @@ object CodeArtifactPackageSpec extends TestSuite {
 
   val tests = Tests {
     test("asMaven") {
-      test("scala") {
-        basePackage.asMaven ==> "name_3.2"
+      test("scala2") {
+        basePackage.copy(scalaVersion = "2.13.5").asMaven ==> "name_2.13"
+      }
+      test("scala3") {
+        basePackage.asMaven ==> "name_3"
       }
       test("java") {
         basePackage.copy(isScalaProject = false).asMaven ==> "name"
       }
       test("sbt") {
-        basePackage.copy(sbtBinaryVersion = Some("1.0")).asMaven ==> "name_3.2_1.0"
+        basePackage.copy(sbtBinaryVersion = Some("1.0")).asMaven ==> "name_3_1.0"
       }
     }
 
     test("versionPublishPath") {
-      basePackage.versionPublishPath ==> "org/example/name_3.2/1.2.3"
+      basePackage.versionPublishPath ==> "org/example/name_3/1.2.3"
     }
 
     test("mavenMetadata") {

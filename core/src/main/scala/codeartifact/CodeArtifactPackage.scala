@@ -18,7 +18,10 @@ final case class CodeArtifactPackage(
     val mvn = if (isScalaProject) {
       sbt.CrossVersion
         .partialVersion(scalaVersion)
-        .map { case (maj, min) => List(name, "_", maj, ".", min).mkString }
+        .map {
+          case (3, _)     => s"${name}_3"
+          case (maj, min) => List(name, "_", maj, ".", min).mkString
+        }
         .getOrElse { sys.error("Invalid scalaVersion.") }
     } else {
       name
