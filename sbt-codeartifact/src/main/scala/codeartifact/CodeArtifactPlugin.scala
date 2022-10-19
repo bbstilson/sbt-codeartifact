@@ -5,13 +5,16 @@ import sbt.Keys._
 import sbt.internal.util.ManagedLogger
 
 object CodeArtifactPlugin extends AutoPlugin {
+
   import CodeArtifactKeys._
   import InternalCodeArtifactKeys._
 
   override def requires = sbt.plugins.JvmPlugin
+
   override def trigger = allRequirements
 
   override def buildSettings: Seq[Setting[_]] = buildPublishSettings
+
   override def projectSettings: Seq[Setting[_]] = codeArtifactSettings
 
   object autoImport extends CodeArtifactKeys
@@ -25,8 +28,10 @@ object CodeArtifactPlugin extends AutoPlugin {
     codeArtifactPublish := dynamicallyPublish.value,
     codeArtifactRepo := CodeArtifactRepo.fromUrl(codeArtifactUrl.value),
     codeArtifactToken := sys.env
+      .get(
+        "CODEARTIFACT_AUTH_TOKEN")
+      .orElse(Credentials.loadCredentials(Path.userHome / ".sbt" / "credentials").toOption.map(_.passwd))
       .getOrElse(
-        "CODEARTIFACT_AUTH_TOKEN",
         CodeArtifact.getAuthToken(codeArtifactRepo.value)
       ),
     codeArtifactConnectTimeout := CodeArtifact.Defaults.CONNECT_TIMEOUT,
@@ -106,9 +111,9 @@ object CodeArtifactPlugin extends AutoPlugin {
   }
 
   private def reportPublishResults(
-    publishResults: Seq[requests.Response],
-    logger: ManagedLogger
-  ) = {
+                                    publishResults: Seq[requests.Response],
+                                    logger: ManagedLogger
+                                  ) = {
     if (publishResults.forall(_.is2xx)) {
       logger.info(s"Successfully published to AWS Codeartifact")
     } else {
