@@ -22,14 +22,14 @@ object CodeArtifactRepo {
 
     // Url looks like:
     // https://<domain>-<owner>.d.codeartifact.us-west-2.amazonaws.com/maven/<repository>
-    val jurl = new java.net.URL(url)
+    val juri = new java.net.URI(url)
 
     // Split on slashes, and get the last element: <repository>.
-    val name = jurl.getPath().split('/').last
+    val name = juri.getPath().split('/').last
 
     // Split on dots. Take the head, which is the <domain>-<owner> section.
     // Split on dashes.
-    val host = jurl.getHost()
+    val host = juri.getHost()
     val parts = host.split('.').head.split('-')
     // Last element is <owner>.
     val owner = parts.last

@@ -6,7 +6,7 @@ trait CodeArtifactKeys {
 
   ///////////
   // Tasks //
-  //////////.
+  ////////// .
 
   val codeArtifactPublish: TaskKey[Unit] =
     taskKey[Unit]("Publish to AWS CodeArtifact.")
