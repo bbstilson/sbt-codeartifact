@@ -25,8 +25,11 @@ object CodeArtifactPlugin extends AutoPlugin {
     codeArtifactPublish := dynamicallyPublish.value,
     codeArtifactRepo := CodeArtifactRepo.fromUrl(codeArtifactUrl.value),
     codeArtifactToken := sys.env
+      .get("CODEARTIFACT_AUTH_TOKEN")
+      .orElse(
+        Credentials.loadCredentials(Path.userHome / ".sbt" / "credentials").toOption.map(_.passwd)
+      )
       .getOrElse(
-        "CODEARTIFACT_AUTH_TOKEN",
         CodeArtifact.getAuthToken(codeArtifactRepo.value)
       ),
     codeArtifactConnectTimeout := CodeArtifact.Defaults.CONNECT_TIMEOUT,
