@@ -63,10 +63,11 @@ object CodeArtifactPlugin extends AutoPlugin {
   // See: https://www.scala-sbt.org/1.x/docs/Howto-Dynamic-Task.html
   private def dynamicallyPublish: Def.Initialize[Task[Unit]] = Def.taskDyn {
     val shouldSkip = (publish / skip).value
+    val publishEnabled = (publish / publishArtifact).value
     val logger = streams.value.log
     val ref = thisProjectRef.value
 
-    if (shouldSkip) Def.task {
+    if (shouldSkip || !publishEnabled) Def.task {
       logger.debug(s"Skipping publish for ${ref.project}")
     }
     else publish0
